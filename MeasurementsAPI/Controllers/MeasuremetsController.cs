@@ -30,6 +30,24 @@ namespace MeasurementsAPI.Controllers
 
         }
 
+        [HttpPost]
+        public async Task<IActionResult> AddMeasurement(Measurement measurement)
+        {
+            try
+            {
+
+                var container = ContainerClient();
+                ContainerProperties properties = await container.ReadContainerAsync();
+                var response = await container.CreateItemAsync(measurement, new PartitionKey(measurement.applicationUserId));
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetMeasurements(string applicationUserId)
         {
@@ -91,6 +109,53 @@ namespace MeasurementsAPI.Controllers
                 return BadRequest(ex.Message);
             }
 
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateMeasurement(Measurement measurement)
+        {
+
+            try
+            {
+                var container = ContainerClient();
+                ItemResponse<Measurement> res = await container.ReadItemAsync<Measurement>(measurement.Id, new PartitionKey(measurement.applicationUserId));
+
+                //Get Existing Item
+                var existingItem = res.Resource;
+
+                //Replace existing item values with new values 
+                existingItem.Value = measurement.Value;
+                existingItem.Type = measurement.Type;
+                existingItem.Unit = measurement.Unit;
+                existingItem.Date = measurement.Date;
+
+                var updateRes = await container.ReplaceItemAsync(existingItem, measurement.Id, new PartitionKey(measurement.applicationUserId));
+
+                return Ok(updateRes.Resource);
+
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteMeasurement(string measurementId, string applicationUserId)
+        {
+
+            try
+            {
+                var container = ContainerClient();
+                var response = await container.DeleteItemAsync<Measurement>(measurementId, new PartitionKey(applicationUserId));
+                return Ok(response.StatusCode);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
