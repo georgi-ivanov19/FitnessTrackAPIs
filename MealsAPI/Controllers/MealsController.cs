@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
+using System.Diagnostics;
 
 namespace MealsAPI.Controllers
 {
@@ -48,27 +49,41 @@ namespace MealsAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetMeals()
+        public async Task<IActionResult> GetMeals(string applicationUserId)
         {
             try
             {
+                
+                Stopwatch stopwatch2 = new Stopwatch();
+                stopwatch2.Start();
                 var container = ContainerClient();
-                var sqlQuery = "SELECT * FROM c";
-                QueryDefinition queryDefinition = new QueryDefinition(sqlQuery);
-                FeedIterator<Meal> queryResultSetIterator = container.GetItemQueryIterator<Meal>(queryDefinition);
+                stopwatch2.Stop();
+                Console.WriteLine($"It took {stopwatch2.ElapsedMilliseconds}ms to Get Container");
+                // add user filter;
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                var parameterizedQuery = new QueryDefinition(
+                    query: "SELECT * FROM Meals m WHERE m.applicationUserId = @partitionKey")
+                        .WithParameter("@partitionKey", applicationUserId);
+                //QueryDefinition queryDefinition = new QueryDefinition(parameterizedQuery);
+                FeedIterator<Meal> queryResultSetIterator = container.GetItemQueryIterator<Meal>(parameterizedQuery);
 
 
                 List<Meal> meals = new List<Meal>();
-
+                var requestCharge = 0d;
                 while (queryResultSetIterator.HasMoreResults)
                 {
                     FeedResponse<Meal> currentResultSet = await queryResultSetIterator.ReadNextAsync();
-                    foreach (Meal employee in currentResultSet)
+                    requestCharge += currentResultSet.RequestCharge;
+                    foreach (Meal meal in currentResultSet)
                     {
-                        meals.Add(employee);
+                        meals.Add(meal);
                     }
+                    Console.WriteLine("hello");
+                   
                 }
-
+                stopwatch.Stop();
+                Console.WriteLine($"It took {stopwatch.ElapsedMilliseconds}ms to Get Meals\t RUs - {requestCharge}");
                 return Ok(meals);
             }
             catch (Exception ex)
@@ -98,7 +113,7 @@ namespace MealsAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateEmployee(Meal meal)
+        public async Task<IActionResult> UpdateMeal(Meal meal)
         {
 
             try
