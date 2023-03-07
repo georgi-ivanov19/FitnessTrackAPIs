@@ -30,7 +30,7 @@ namespace MealsAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddEmployee(Meal meal)
+        public async Task<IActionResult> AddMeal(Meal meal)
         {
             try
             {
