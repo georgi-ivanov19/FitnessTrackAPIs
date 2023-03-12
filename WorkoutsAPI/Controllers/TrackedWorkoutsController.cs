@@ -59,12 +59,14 @@ namespace WorkoutsAPI.Controllers
             {
                 return NotFound("Parent Workout not found");
             }
-            var latestCompleted = workout.TrackedWorkouts.Where(w => w.IsCompleted).OrderByDescending(w => w.EndTime).First();
-            if (workout == null)
-            {
-                return NotFound("Workout not found");
+
+            var completeWorkouts = workout.TrackedWorkouts.Where(w => w.IsCompleted);
+            if(!completeWorkouts.Any()){
+                return NotFound("No complete workouts found");
             }
-            return Ok(workout);
+
+            var latestCompleted = completeWorkouts.OrderByDescending(w => w.EndTime).First();
+            return Ok(latestCompleted);
         }
 
         [HttpPut("{id}")]
