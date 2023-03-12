@@ -9,8 +9,8 @@ namespace MealsAPI.Models
 {
     public class Meal
     {
-        [JsonProperty(PropertyName = "id")]
-        public string Id { get; set; }
+        //[JsonProperty(PropertyName = "id")]
+        public int Id { get; set; }
         public string applicationUserId { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
         public double TotalCalories { get; set; }
