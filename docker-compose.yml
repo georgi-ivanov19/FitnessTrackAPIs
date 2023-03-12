@@ -1,0 +1,54 @@
+version: "3.4"
+
+services:
+  workoutsapi:
+    image: ${DOCKER_REGISTRY-}workoutsapi
+    build:
+      context: ./WorkoutsAPI
+      dockerfile: Dockerfile
+    container_name: WorkoutsAPI
+    ports:
+      - "8081:80"
+      - "8082:443"
+
+    depends_on:
+      - database
+
+  database:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    ports:
+      - "1401:1433"
+    container_name: "WorkoutsDB"
+    hostname: "WorkoutsDB"
+    environment:
+      MSSQL_SA_PASSWORD: "S3cur3P@ssW0rd!"
+      ACCEPT_EULA: "Y"
+
+  measurements-api:
+    image: ${DOCKER_REGISTRY-}measurementsapi
+    build:
+      context: ./MeasurementsAPI
+      dockerfile: Dockerfile
+    container_name: MeasurementsAPI
+    ports:
+      - "8083:80"
+      - "8084:443"
+    depends_on:
+      - measurements-database
+
+  measurements-database:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    ports:
+      - "1402:1433"
+    container_name: "MeasurementsDB"
+    hostname: "MeasurementsDB"
+    environment:
+      MSSQL_SA_PASSWORD: "S3cur3P@ssW0rd!"
+      ACCEPT_EULA: "Y"
+
+  frontend:
+    image: "jorjooo/fitness-track-frontend"
+    container_name: "FitnessTrackFrontend"
+    ports:
+      - "80:80"
+      - "443:443"

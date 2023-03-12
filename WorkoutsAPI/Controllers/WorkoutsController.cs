@@ -21,13 +21,11 @@ namespace WorkoutsAPI.Controllers
 
         [HttpGet]
         public async Task<ActionResult<List<Workout>>> GetWorkouts(string userId)
-        {
-            Console.WriteLine(userId);
+        {        
             if (userId == null)
             {
                 return NotFound("UserId is a required query parameter");
-            }
-            Console.WriteLine(userId);
+            }          
             var workouts = await _context.Workouts.Where(w => w.ApplicationUserId == userId).ToListAsync();          
             return Ok(workouts);
         }

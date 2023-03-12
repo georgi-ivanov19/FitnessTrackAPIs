@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkoutsAPI", "WorkoutsAPI.csproj", "{06213BCF-EF1A-4137-84FF-677063B6D9E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkoutsAPI", "WorkoutsAPI.csproj", "{06213BCF-EF1A-4137-84FF-677063B6D9E0}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{8E142FFB-7152-4A35-91B6-902EACD59E6F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{06213BCF-EF1A-4137-84FF-677063B6D9E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06213BCF-EF1A-4137-84FF-677063B6D9E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06213BCF-EF1A-4137-84FF-677063B6D9E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E142FFB-7152-4A35-91B6-902EACD59E6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E142FFB-7152-4A35-91B6-902EACD59E6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E142FFB-7152-4A35-91B6-902EACD59E6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E142FFB-7152-4A35-91B6-902EACD59E6F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
