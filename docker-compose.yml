@@ -9,7 +9,6 @@ services:
     container_name: WorkoutsAPI
     ports:
       - "8081:80"
-      - "8082:443"
 
     depends_on:
       - database
@@ -23,6 +22,10 @@ services:
     environment:
       MSSQL_SA_PASSWORD: "S3cur3P@ssW0rd!"
       ACCEPT_EULA: "Y"
+    volumes:
+      - "./WorkoutsAPI/mssql/data:/var/opt/mssql/data"
+      - "./WorkoutsAPI/mssql/log:/var/opt/mssql/log"
+      - "./WorkoutsAPI/mssql/secrets:/var/opt/mssql/secrets"
 
   measurements-api:
     image: ${DOCKER_REGISTRY-}measurementsapi
@@ -32,7 +35,6 @@ services:
     container_name: MeasurementsAPI
     ports:
       - "8083:80"
-      - "8084:443"
     depends_on:
       - measurements-database
 
@@ -45,6 +47,44 @@ services:
     environment:
       MSSQL_SA_PASSWORD: "S3cur3P@ssW0rd!"
       ACCEPT_EULA: "Y"
+    volumes:
+      - "./MeasurementsAPI/mssql/data:/var/opt/mssql/data"
+      - "./MeasurementsAPI/mssql/log:/var/opt/mssql/log"
+      - "./MeasurementsAPI/mssql/secrets:/var/opt/mssql/secrets"
+
+  meals-api:
+    image: ${DOCKER_REGISTRY-}mealsapi
+    build:
+      context: ./MealsAPI
+      dockerfile: Dockerfile
+    container_name: MealsAPI
+    ports:
+      - "8085:80"
+    depends_on:
+      - meals-database
+    # command:
+    #   [
+    #     "./wait-for-it.sh",
+    #     "meals-database:1433",
+    #     "-t",
+    #     "60",
+    #     "dotnet",
+    #     "MealsAPI.dll",
+    #   ]
+
+  meals-database:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    ports:
+      - "1403:1433"
+    container_name: "MealsDB"
+    hostname: "MealsDB"
+    environment:
+      MSSQL_SA_PASSWORD: "S3cur3P@ssW0rd!"
+      ACCEPT_EULA: "Y"
+    volumes:
+      - "./MealsAPI/mssql/data:/var/opt/mssql/data"
+      - "./MealsAPI/mssql/log:/var/opt/mssql/log"
+      - "./MealsAPI/mssql/secrets:/var/opt/mssql/secrets"
 
   frontend:
     image: "jorjooo/fitness-track-frontend"
