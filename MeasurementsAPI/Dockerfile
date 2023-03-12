@@ -16,6 +16,11 @@ FROM build AS publish
 RUN dotnet publish "MeasurementsAPI.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
+#Copy the wait-for-it.sh script to the container
+COPY ./wait-for-it.sh wait-for-it.sh
+#Make the wait-for-it.sh script executable
+RUN chmod +x wait-for-it.sh
+
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "MeasurementsAPI.dll"]
+ENTRYPOINT ["./wait-for-it.sh", "measurements-database:1433", "--timeout=60", "--strict", "--", "dotnet", "MeasurementsAPI.dll"]

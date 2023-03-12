@@ -71,6 +71,7 @@ namespace MeasurementsAPI.Controllers
                 return BadRequest("User ID is a required parameter");
             }
             var measurements = await _context.Measurements.Where(m => m.applicationUserId == applicationUserId).ToListAsync();
+
             return Ok(measurements);
 
             //try
@@ -180,7 +181,7 @@ namespace MeasurementsAPI.Controllers
 
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMeasurement(int id) // (string measurementId, string applicationUserId)
         {
             var dbMeasurement = await _context.Measurements.FirstOrDefaultAsync(w => w.Id == id);
@@ -193,6 +194,61 @@ namespace MeasurementsAPI.Controllers
             await _context.SaveChangesAsync();
 
             return Ok();
+        }
+
+        [HttpGet("GetAverages")]
+        public async Task<ActionResult<List<AverageResults>>> GetAverages([FromQuery] string userId, [FromQuery] DateTime date)
+        {
+            // 7 days moving average from date for each measurement
+            var userMeasurements = await _context.Measurements.Where(m => m.applicationUserId == userId && m.Date >= date.AddDays(-14) && m.Date <= date).ToListAsync();
+
+            if (userMeasurements == null && userMeasurements.Count == 0)
+            {
+                return NotFound("User has no measurements");
+            }
+            var weightMeasurements = new List<Measurement>();
+            var waistMeasurements = new List<Measurement>();
+            var bfMeasurements = new List<Measurement>();
+            foreach (var measurement in userMeasurements)
+            {
+                switch (measurement.Type)
+                {
+                    case "Weight":
+                        weightMeasurements.Add(measurement);
+                        break;
+                    case "Waist":
+                        waistMeasurements.Add(measurement);
+                        break;
+                    case "Body fat":
+                        bfMeasurements.Add(measurement);
+                        break;
+                }
+            }
+            return new List<AverageResults>
+            {
+                CalculateAverages(date, weightMeasurements),
+                CalculateAverages(date, waistMeasurements),
+                CalculateAverages(date, bfMeasurements)
+            };
+        }
+
+        private AverageResults CalculateAverages(DateTime date, List<Measurement> measurements)
+        {
+            var currentMeasurements = measurements.Where(m => m.Date >= date.AddDays(-7));
+            var previousMeasurements = measurements.Where(m => m.Date < date.AddDays(-7));
+            double? currentAverage = null;
+            double? previousAverage = null;
+            int currentCount = 0;
+            if(currentMeasurements.Any())
+            {
+                currentAverage = currentMeasurements.Average(m => m.Value);
+                currentCount = currentMeasurements.Count();
+            }
+            if(previousMeasurements.Any())
+            {
+                previousAverage = previousMeasurements.Average(m => m.Value);
+            }
+            return new AverageResults(currentAverage, currentCount, previousAverage);
         }
     }
 }
