@@ -10,7 +10,7 @@ namespace MeasurementsAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MeasuremetsController : ControllerBase
+    public class MeasurementsController : ControllerBase
     {
         //// Cosmos DB details, In real use cases, these details should be configured in secure configuraion file.
         //private readonly string CosmosDBAccountUri = "https://fitness-track-cn.documents.azure.com:443/";
@@ -34,7 +34,7 @@ namespace MeasurementsAPI.Controllers
 
         private readonly DatabaseContext _context;
 
-        public MeasuremetsController(DatabaseContext context)
+        public MeasurementsController(DatabaseContext context)
         {
             _context = context;
         }
