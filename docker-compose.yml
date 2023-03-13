@@ -2,7 +2,7 @@ version: "3.4"
 
 services:
   workoutsapi:
-    image: ${DOCKER_REGISTRY-}workoutsapi
+    image: "jorjooo/workouts-api"
     build:
       context: ./WorkoutsAPI
       dockerfile: Dockerfile
@@ -28,7 +28,7 @@ services:
       - "./WorkoutsAPI/mssql/secrets:/var/opt/mssql/secrets"
 
   measurements-api:
-    image: ${DOCKER_REGISTRY-}measurementsapi
+    image: "jorjooo/measurements-api"
     build:
       context: ./MeasurementsAPI
       dockerfile: Dockerfile
@@ -53,7 +53,7 @@ services:
       - "./MeasurementsAPI/mssql/secrets:/var/opt/mssql/secrets"
 
   meals-api:
-    image: ${DOCKER_REGISTRY-}mealsapi
+    image: "jorjooo/meals-api"
     build:
       context: ./MealsAPI
       dockerfile: Dockerfile
@@ -62,15 +62,6 @@ services:
       - "8085:80"
     depends_on:
       - meals-database
-    # command:
-    #   [
-    #     "./wait-for-it.sh",
-    #     "meals-database:1433",
-    #     "-t",
-    #     "60",
-    #     "dotnet",
-    #     "MealsAPI.dll",
-    #   ]
 
   meals-database:
     image: "mcr.microsoft.com/mssql/server:2022-latest"
@@ -85,6 +76,23 @@ services:
       - "./MealsAPI/mssql/data:/var/opt/mssql/data"
       - "./MealsAPI/mssql/log:/var/opt/mssql/log"
       - "./MealsAPI/mssql/secrets:/var/opt/mssql/secrets"
+
+  dashboard-api:
+    image: "jorjooo/dashboard-api"
+    build:
+      context: ./DashboardAPI
+      dockerfile: Dockerfile
+    container_name: DashboardAPI
+    ports:
+      - "8087:80"
+    depends_on:
+      - meals-database
+      - measurements-database
+      - database
+    environment:
+      WAIT_HOSTS: database:1433, meals-database:1433, measurements-database:1433
+      WAIT_TIMEOUT: 300
+      WAIT_BEFORE: 15
 
   frontend:
     image: "jorjooo/fitness-track-frontend"
