@@ -5,6 +5,10 @@ using DashboardAPI.Models.Workouts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
+using System.Text;
+using System.Text.Json;
 
 namespace DashboardAPI.Controllers
 {
@@ -15,11 +19,55 @@ namespace DashboardAPI.Controllers
         private readonly WorkoutsDatabaseContext _workoutsContext;
         private readonly MealsDatabaseContext _mealsContext;
         private readonly MeasurementsDatabaseContext _measurementsContext;
-        public DashboardController(WorkoutsDatabaseContext workoutsContext, MealsDatabaseContext mealsContext, MeasurementsDatabaseContext measurementsContext)
+        private readonly IDistributedCache _cache;
+
+        public DashboardController(WorkoutsDatabaseContext workoutsContext,
+            MealsDatabaseContext mealsContext,
+            MeasurementsDatabaseContext measurementsContext,
+            IDistributedCache cache)
         {
             _workoutsContext = workoutsContext;
             _mealsContext = mealsContext;
             _measurementsContext = measurementsContext;
+            _cache = cache;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<DashboardResults>> GetAverages([FromQuery] string userId, [FromQuery] DateTime date)
+        {
+            DashboardResults? results;
+            byte[]? cachedData = await _cache.GetAsync(userId);
+            if (cachedData != null)
+            {
+                Console.WriteLine("!!!!!!!!!This is from cache!!!!!!!!!");
+                // If the data is found in the cache, encode and deserialize cached data.
+                var cachedDataString = Encoding.UTF8.GetString(cachedData);
+                results = JsonSerializer.Deserialize<DashboardResults>(cachedDataString);
+
+            }
+            else
+            {
+                var workoutsResponse = await GetWorkoutsAverages(userId, date);
+                var workoutsAverages = workoutsResponse.Value;
+
+                var measurementsResponse = await GetMeasurementsAverages(userId, date);
+                var measurementsAverages = measurementsResponse.Value;
+
+                var mealsResponse = await GetMealsAverages(userId, date);
+                var mealsAverages = mealsResponse.Value;
+
+                results = new DashboardResults(measurementsAverages, mealsAverages, workoutsAverages);
+
+                DistributedCacheEntryOptions options = new DistributedCacheEntryOptions()
+                   .SetSlidingExpiration(TimeSpan.FromMinutes(60));
+                // Cache data
+                string cachedDataString = JsonSerializer.Serialize(results);
+                var dataToCache = Encoding.UTF8.GetBytes(cachedDataString);
+                // Add the data into the cache
+                await _cache.SetAsync(userId, dataToCache, options);
+
+            }
+            return Ok(results);
         }
 
         [HttpGet("GetWorkoutsAverages")]
@@ -144,15 +192,28 @@ namespace DashboardAPI.Controllers
         [HttpGet("GetMealsAverages")]
         public async Task<ActionResult<List<AverageResults>>> GetMealsAverages([FromQuery] string userId, [FromQuery] DateTime date)
         {
-            var userMeals = await _mealsContext.Meals.Where(m => m.ApplicationUserId == userId && m.Date >= date.AddDays(-14) && m.Date <= date).ToListAsync();
-
-
-            if (userMeals == null)
+            List<AverageResults>? results;
+            byte[]? cachedData = await _cache.GetAsync(userId);
+            if (cachedData != null)
             {
-                return NotFound("User has not Meals");
+                // If the data is found in the cache, encode and deserialize cached data.
+                var cachedDataString = Encoding.UTF8.GetString(cachedData);
+                results = JsonSerializer.Deserialize<List<AverageResults>>(cachedDataString);
+                Console.WriteLine("!!!!!!!!!This is from cache!!!!!!!!!");
+            }
+            else
+            {
+                var userMeals = await _mealsContext.Meals.Where(m => m.ApplicationUserId == userId && m.Date >= date.AddDays(-14) && m.Date <= date).ToListAsync();
+
+                if (userMeals == null)
+                {
+                    return NotFound("User has not Meals");
+                }
+
+                results = CalculateMealsAverages(date, userMeals);
             }
 
-            return CalculateMealsAverages(date, userMeals);
+            return results;
         }
 
         private List<AverageResults> CalculateMealsAverages(DateTime date, List<Meal> meals)

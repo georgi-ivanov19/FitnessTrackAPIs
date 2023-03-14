@@ -89,10 +89,16 @@ services:
       - meals-database
       - measurements-database
       - database
+      - redis
     environment:
       WAIT_HOSTS: database:1433, meals-database:1433, measurements-database:1433
       WAIT_TIMEOUT: 300
       WAIT_BEFORE: 15
+
+  redis:
+    image: "redis"
+    ports:
+      - "6379:6379"
 
   frontend:
     image: "jorjooo/fitness-track-frontend"

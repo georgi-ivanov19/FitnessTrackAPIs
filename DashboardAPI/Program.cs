@@ -6,6 +6,10 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+});
 var mealsDbConnectionString = builder.Configuration.GetConnectionString("MealsDBConnection") ?? throw new InvalidOperationException("Connection string 'MealsDBConnection'... not found.");
 var measurementsDbConnectionString = builder.Configuration.GetConnectionString("MeasurementsDBConnection") ?? throw new InvalidOperationException("Connection string 'MeasurementsDBConnection'... not found.");
 var workoutsDbConnectionString = builder.Configuration.GetConnectionString("WorkoutsDBConnection") ?? throw new InvalidOperationException("Connection string 'WorkoutsDBConnection'... not found.");
