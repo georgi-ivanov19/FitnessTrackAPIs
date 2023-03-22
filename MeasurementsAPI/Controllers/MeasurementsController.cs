@@ -42,20 +42,6 @@ namespace MeasurementsAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Measurement>> AddMeasurement(Measurement measurement)
         {
-            //try
-            //{
-
-            //    var container = ContainerClient();
-            //    ContainerProperties properties = await container.ReadContainerAsync();
-            //    var response = await container.CreateItemAsync(measurement, new PartitionKey(measurement.applicationUserId));
-
-            //    return Ok(response);
-            //}
-            //catch (Exception ex)
-            //{
-            //    return BadRequest(ex.Message);
-            //}
-
             _context.Measurements.Add(measurement);
             await _context.SaveChangesAsync();
 
@@ -73,47 +59,6 @@ namespace MeasurementsAPI.Controllers
             var measurements = await _context.Measurements.Where(m => m.applicationUserId == applicationUserId).ToListAsync();
 
             return Ok(measurements);
-
-            //try
-            //{
-
-            //    Stopwatch stopwatch2 = new Stopwatch();
-            //    stopwatch2.Start();
-            //    var container = ContainerClient();
-            //    stopwatch2.Stop();
-            //    Console.WriteLine($"It took {stopwatch2.ElapsedMilliseconds}ms to Get Container");
-            //    // add user filter;
-            //    Stopwatch stopwatch = new Stopwatch();
-            //    stopwatch.Start();
-            //    var parameterizedQuery = new QueryDefinition(
-            //        query: "SELECT * FROM Measurements m WHERE m.applicationUserId = @partitionKey")
-            //            .WithParameter("@partitionKey", applicationUserId);
-            //    //QueryDefinition queryDefinition = new QueryDefinition(parameterizedQuery);
-            //    FeedIterator<Measurement> queryResultSetIterator = container.GetItemQueryIterator<Measurement>(parameterizedQuery);
-
-
-            //    List<Measurement> measurements = new List<Measurement>();
-            //    var requestCharge = 0d;
-            //    while (queryResultSetIterator.HasMoreResults)
-            //    {
-            //        FeedResponse<Measurement> currentResultSet = await queryResultSetIterator.ReadNextAsync();
-            //        requestCharge += currentResultSet.RequestCharge;
-            //        foreach (Measurement employee in currentResultSet)
-            //        {
-            //            measurements.Add(employee);
-            //        }
-            //        Console.WriteLine("hello");
-
-            //    }
-            //    stopwatch.Stop();
-            //    Console.WriteLine($"It took {stopwatch.ElapsedMilliseconds}ms to Get Measurements\t RUs - {requestCharge}");
-            //    return Ok(measurements);
-            //}
-            //catch (Exception ex)
-            //{
-
-            //    return BadRequest(ex.Message);
-            //}
         }
 
         [HttpGet("{measurementId}")]
@@ -125,18 +70,6 @@ namespace MeasurementsAPI.Controllers
                 return NotFound("Measurement not found");
             }
             return Ok(measurement);
-            //try
-            //{
-            //    var container = ContainerClient();
-            //    ItemResponse<Measurement> response = await container.ReadItemAsync<Measurement>(measurementId, new PartitionKey(applicationUserId));
-            //    return Ok(response.Resource);
-            //}
-            //catch (Exception ex)
-            //{
-
-            //    return BadRequest(ex.Message);
-            //}
-
         }
 
         [HttpPut("{id}")]
@@ -151,43 +84,19 @@ namespace MeasurementsAPI.Controllers
             dbMeasurement.Unit = measurement.Unit;
             dbMeasurement.Type = measurement.Type;
             dbMeasurement.Date = measurement.Date;
+
             await _context.SaveChangesAsync();
 
             return Ok(dbMeasurement);
-            //try
-            //{
-            //    var container = ContainerClient();
-            //    ItemResponse<Measurement> res = await container.ReadItemAsync<Measurement>(measurement.Id, new PartitionKey(measurement.applicationUserId));
-
-            //    //Get Existing Item
-            //    var existingItem = res.Resource;
-
-            //    //Replace existing item values with new values
-            //    existingItem.Value = measurement.Value;
-            //    existingItem.Type = measurement.Type;
-            //    existingItem.Unit = measurement.Unit;
-            //    existingItem.Date = measurement.Date;
-
-            //    var updateRes = await container.ReplaceItemAsync(existingItem, measurement.Id, new PartitionKey(measurement.applicationUserId));
-
-            //    return Ok(updateRes.Resource);
-
-            //}
-            //catch (Exception ex)
-            //{
-
-            //    return BadRequest(ex.Message);
-        // }
-
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteMeasurement(int id) // (string measurementId, string applicationUserId)
+        public async Task<IActionResult> DeleteMeasurement(int id)
         {
             var dbMeasurement = await _context.Measurements.FirstOrDefaultAsync(w => w.Id == id);
             if (dbMeasurement == null)
             {
-                return NotFound("Workout Not Found");
+                return NotFound("Measurement Not Found");
             }
 
             _context.Measurements.Remove(dbMeasurement);
@@ -196,59 +105,59 @@ namespace MeasurementsAPI.Controllers
             return Ok();
         }
 
-        [HttpGet("GetAverages")]
-        public async Task<ActionResult<List<AverageResults>>> GetAverages([FromQuery] string userId, [FromQuery] DateTime date)
-        {
-            // 7 days moving average from date for each measurement
-            var userMeasurements = await _context.Measurements.Where(m => m.applicationUserId == userId && m.Date >= date.AddDays(-14) && m.Date <= date).ToListAsync();
+        // [HttpGet("GetAverages")]
+        // public async Task<ActionResult<List<AverageResults>>> GetAverages([FromQuery] string userId, [FromQuery] DateTime date)
+        // {
+        //     // 7 days moving average from date for each measurement
+        //     var userMeasurements = await _context.Measurements.Where(m => m.applicationUserId == userId && m.Date >= date.AddDays(-14) && m.Date <= date).ToListAsync();
 
-            if (userMeasurements == null && userMeasurements.Count == 0)
-            {
-                return NotFound("User has no measurements");
-            }
-            var weightMeasurements = new List<Measurement>();
-            var waistMeasurements = new List<Measurement>();
-            var bfMeasurements = new List<Measurement>();
-            foreach (var measurement in userMeasurements)
-            {
-                switch (measurement.Type)
-                {
-                    case "Weight":
-                        weightMeasurements.Add(measurement);
-                        break;
-                    case "Waist":
-                        waistMeasurements.Add(measurement);
-                        break;
-                    case "Body fat":
-                        bfMeasurements.Add(measurement);
-                        break;
-                }
-            }
-            return new List<AverageResults>
-            {
-                CalculateAverages(date, weightMeasurements),
-                CalculateAverages(date, waistMeasurements),
-                CalculateAverages(date, bfMeasurements)
-            };
-        }
+        //     if (userMeasurements == null && userMeasurements.Count == 0)
+        //     {
+        //         return NotFound("User has no measurements");
+        //     }
+        //     var weightMeasurements = new List<Measurement>();
+        //     var waistMeasurements = new List<Measurement>();
+        //     var bfMeasurements = new List<Measurement>();
+        //     foreach (var measurement in userMeasurements)
+        //     {
+        //         switch (measurement.Type)
+        //         {
+        //             case "Weight":
+        //                 weightMeasurements.Add(measurement);
+        //                 break;
+        //             case "Waist":
+        //                 waistMeasurements.Add(measurement);
+        //                 break;
+        //             case "Body fat":
+        //                 bfMeasurements.Add(measurement);
+        //                 break;
+        //         }
+        //     }
+        //     return new List<AverageResults>
+        //     {
+        //         CalculateAverages(date, weightMeasurements),
+        //         CalculateAverages(date, waistMeasurements),
+        //         CalculateAverages(date, bfMeasurements)
+        //     };
+        // }
 
-        private AverageResults CalculateAverages(DateTime date, List<Measurement> measurements)
-        {
-            var currentMeasurements = measurements.Where(m => m.Date >= date.AddDays(-7));
-            var previousMeasurements = measurements.Where(m => m.Date < date.AddDays(-7));
-            double? currentAverage = null;
-            double? previousAverage = null;
-            int currentCount = 0;
-            if(currentMeasurements.Any())
-            {
-                currentAverage = currentMeasurements.Average(m => m.Value);
-                currentCount = currentMeasurements.Count();
-            }
-            if(previousMeasurements.Any())
-            {
-                previousAverage = previousMeasurements.Average(m => m.Value);
-            }
-            return new AverageResults(currentAverage, currentCount, previousAverage);
-        }
+        // private AverageResults CalculateAverages(DateTime date, List<Measurement> measurements)
+        // {
+        //     var currentMeasurements = measurements.Where(m => m.Date >= date.AddDays(-7));
+        //     var previousMeasurements = measurements.Where(m => m.Date < date.AddDays(-7));
+        //     double? currentAverage = null;
+        //     double? previousAverage = null;
+        //     int currentCount = 0;
+        //     if(currentMeasurements.Any())
+        //     {
+        //         currentAverage = currentMeasurements.Average(m => m.Value);
+        //         currentCount = currentMeasurements.Count();
+        //     }
+        //     if(previousMeasurements.Any())
+        //     {
+        //         previousAverage = previousMeasurements.Average(m => m.Value);
+        //     }
+        //     return new AverageResults(currentAverage, currentCount, previousAverage);
+        // }
     }
 }

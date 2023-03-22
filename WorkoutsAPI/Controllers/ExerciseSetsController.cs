@@ -89,7 +89,7 @@ namespace WorkoutsAPI.Controllers
             var dbExerciseSet = await _context.ExerciseSets.FirstOrDefaultAsync(ex => ex.Id == id);
             if (dbExerciseSet == null)
             {
-                return NotFound("Exercise Not Found");
+                return NotFound("ExerciseSet Not Found");
             }
 
             _context.ExerciseSets.Remove(dbExerciseSet);

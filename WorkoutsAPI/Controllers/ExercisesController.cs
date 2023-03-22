@@ -25,7 +25,7 @@ namespace WorkoutsAPI.Controllers
         // GET: api/Exercises
         [HttpGet("GetExercises/{id}")]
         public async Task<ActionResult<List<Exercise>>> GetExercisesForWorkout(int id)
-        {          
+        {
             var workout = await _context.Workouts.FirstOrDefaultAsync(w => w.Id == id);
             if (workout == null)
             {
@@ -38,18 +38,17 @@ namespace WorkoutsAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Exercise>> GetExercise(int id)
         {
-          if (_context.Exercises == null)
-          {
-              return NotFound();
-          }
-            var exercise = await _context.Exercises.FindAsync(id);
-
-            if (exercise == null)
+            if (_context.Exercises == null)
             {
                 return NotFound();
             }
+            var exercise = await _context.Exercises.FindAsync(id);
+            if (exercise == null)
+            {
+                return NotFound("Exercise not found");
+            }
 
-            return exercise;
+            return Ok(exercise);
         }
 
         // PUT: api/Exercises/5
