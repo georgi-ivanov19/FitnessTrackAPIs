@@ -59,7 +59,7 @@ namespace DashboardAPI.Controllers
                 results = new DashboardResults(measurementsAverages, mealsAverages, workoutsAverages);
 
                 DistributedCacheEntryOptions options = new DistributedCacheEntryOptions()
-                   .SetSlidingExpiration(TimeSpan.FromMinutes(60));
+                   .SetSlidingExpiration(TimeSpan.FromHours(12));
                 // Cache data
                 string cachedDataString = JsonSerializer.Serialize(results);
                 var dataToCache = Encoding.UTF8.GetBytes(cachedDataString);

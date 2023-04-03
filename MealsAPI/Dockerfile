@@ -33,5 +33,4 @@ COPY --from=publish /app/publish .
 
 
 
-# ENTRYPOINT ["dotnet", "MealsAPI.dll"]
-ENTRYPOINT ["./wait-for-it.sh", "meals-database:1433", "--timeout=60", "--strict", "--", "dotnet", "MealsAPI.dll"]
+ENTRYPOINT ["dotnet", "MealsAPI.dll"]

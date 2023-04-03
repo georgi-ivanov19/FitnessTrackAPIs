@@ -15,7 +15,7 @@ mssql
 
 # Mono auto generated files
 mono_crash.*
-
+.env
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

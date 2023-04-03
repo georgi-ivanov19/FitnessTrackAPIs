@@ -23,4 +23,4 @@ RUN chmod +x wait-for-it.sh
 
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["./wait-for-it.sh", "measurements-database:1433", "--timeout=60", "--strict", "--", "dotnet", "MeasurementsAPI.dll"]
+ENTRYPOINT ["dotnet", "MeasurementsAPI.dll"]

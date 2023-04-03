@@ -1,38 +1,114 @@
 version: "3.4"
 
+volumes:
+  workouts-data:
+    driver: azure_file
+    driver_opts:
+      share_name: workouts
+      storage_account_name: containerssto
+      storage_account_key: OUJr5oaZv8RNvRmDP37ix3HnVMhtSEjhU2WU/QJlRhfKWd6tO9gA8jBe+r7kBGl6J91/elt3TFD3+AStpRSMyw==
+    labels:
+      com.microsoft.azure.volume.azurefile.workingdir: /Workouts/data
+  workouts-log:
+    driver: azure_file
+    driver_opts:
+      share_name: workouts
+      storage_account_name: containerssto
+      storage_account_key: OUJr5oaZv8RNvRmDP37ix3HnVMhtSEjhU2WU/QJlRhfKWd6tO9gA8jBe+r7kBGl6J91/elt3TFD3+AStpRSMyw==
+    labels:
+      com.microsoft.azure.volume.azurefile.workingdir: /Workouts/log
+  workouts-secrets:
+    driver: azure_file
+    driver_opts:
+      share_name: workouts
+      storage_account_name: containerssto
+      storage_account_key: OUJr5oaZv8RNvRmDP37ix3HnVMhtSEjhU2WU/QJlRhfKWd6tO9gA8jBe+r7kBGl6J91/elt3TFD3+AStpRSMyw==
+    labels:
+      com.microsoft.azure.volume.azurefile.workingdir: /Workouts/secrets
+
+  measurements-data:
+    driver: azure_file
+    driver_opts:
+      share_name: measurements
+      storage_account_name: containerssto
+      storage_account_key: OUJr5oaZv8RNvRmDP37ix3HnVMhtSEjhU2WU/QJlRhfKWd6tO9gA8jBe+r7kBGl6J91/elt3TFD3+AStpRSMyw==
+    labels:
+      com.microsoft.azure.volume.azurefile.workingdir: /measurements/data
+  measurements-log:
+    driver: azure_file
+    driver_opts:
+      share_name: measurements
+      storage_account_name: containerssto
+      storage_account_key: OUJr5oaZv8RNvRmDP37ix3HnVMhtSEjhU2WU/QJlRhfKWd6tO9gA8jBe+r7kBGl6J91/elt3TFD3+AStpRSMyw==
+    labels:
+      com.microsoft.azure.volume.azurefile.workingdir: /measurements/log
+  measurements-secrets:
+    driver: azure_file
+    driver_opts:
+      share_name: measurements
+      storage_account_name: containerssto
+      storage_account_key: OUJr5oaZv8RNvRmDP37ix3HnVMhtSEjhU2WU/QJlRhfKWd6tO9gA8jBe+r7kBGl6J91/elt3TFD3+AStpRSMyw==
+    labels:
+      com.microsoft.azure.volume.azurefile.workingdir: /measurements/secrets
+
+  meals-data:
+    driver: azure_file
+    driver_opts:
+      share_name: meals
+      storage_account_name: containerssto
+      storage_account_key: OUJr5oaZv8RNvRmDP37ix3HnVMhtSEjhU2WU/QJlRhfKWd6tO9gA8jBe+r7kBGl6J91/elt3TFD3+AStpRSMyw==
+    labels:
+      com.microsoft.azure.volume.azurefile.workingdir: /meals/data
+  meals-log:
+    driver: azure_file
+    driver_opts:
+      share_name: meals
+      storage_account_name: containerssto
+      storage_account_key: OUJr5oaZv8RNvRmDP37ix3HnVMhtSEjhU2WU/QJlRhfKWd6tO9gA8jBe+r7kBGl6J91/elt3TFD3+AStpRSMyw==
+    labels:
+      com.microsoft.azure.volume.azurefile.workingdir: /meals/log
+  meals-secrets:
+    driver: azure_file
+    driver_opts:
+      share_name: meals
+      storage_account_name: containerssto
+      storage_account_key: OUJr5oaZv8RNvRmDP37ix3HnVMhtSEjhU2WU/QJlRhfKWd6tO9gA8jBe+r7kBGl6J91/elt3TFD3+AStpRSMyw==
+    labels:
+      com.microsoft.azure.volume.azurefile.workingdir: /meals/secrets
+
 services:
   workoutsapi:
-    image: "jorjooo/workouts-api"
-    build:
-      context: ./WorkoutsAPI
-      dockerfile: Dockerfile
-    container_name: WorkoutsAPI
+    image: containerimageregistry.azurecr.io/workouts-api:latest
+    container_name: workouts-api
     ports:
-      - "8081:80"
-
+      - "8081:8081"
     depends_on:
       - database
+    domainname: "fitness-track"
 
   database:
-    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
-      - "1401:1433"
-    container_name: "WorkoutsDB"
-    hostname: "WorkoutsDB"
+      - "1433:1433"
+    container_name: workouts-database
+    hostname: "workouts-db"
     environment:
-      MSSQL_SA_PASSWORD: "S3cur3P@ssW0rd!"
+      MSSQL_SA_PASSWORD: S3cur3PassW0rd
       ACCEPT_EULA: "Y"
     volumes:
-      - "./WorkoutsAPI/mssql/data:/var/opt/mssql/data"
-      - "./WorkoutsAPI/mssql/log:/var/opt/mssql/log"
-      - "./WorkoutsAPI/mssql/secrets:/var/opt/mssql/secrets"
+      - workouts-data:/var/opt/mssql/data
+      - workouts-log:/var/opt/mssql/log
+      - workouts-secrets:/var/opt/mssql/secrets
+      # - "./WorkoutsAPI/mssql/data:/var/opt/mssql/data"
+      # - "./WorkoutsAPI/mssql/log:/var/opt/mssql/log"
+      # - "./WorkoutsAPI/mssql/secrets:/var/opt/mssql/secrets"
 
   measurements-api:
-    image: "jorjooo/measurements-api"
+    image: containerimageregistry.azurecr.io/measurements-api:latest
     build:
       context: ./MeasurementsAPI
       dockerfile: Dockerfile
-    container_name: MeasurementsAPI
+    container_name: measurements-api
     ports:
       - "8083:80"
     depends_on:
@@ -42,47 +118,54 @@ services:
     image: "mcr.microsoft.com/mssql/server:2022-latest"
     ports:
       - "1402:1433"
-    container_name: "MeasurementsDB"
-    hostname: "MeasurementsDB"
+    container_name: measurements-database
+    hostname: "measurements-db"
     environment:
       MSSQL_SA_PASSWORD: "S3cur3P@ssW0rd!"
       ACCEPT_EULA: "Y"
     volumes:
+      # - measurements-data:/var/opt/mssql/data
+      # - measurements-log:/var/opt/mssql/log
+      # - measurements-secrets:/var/opt/mssql/secrets
       - "./MeasurementsAPI/mssql/data:/var/opt/mssql/data"
       - "./MeasurementsAPI/mssql/log:/var/opt/mssql/log"
       - "./MeasurementsAPI/mssql/secrets:/var/opt/mssql/secrets"
 
   meals-api:
-    image: "jorjooo/meals-api"
+    image: containerimageregistry.azurecr.io/meals-api:latest
     build:
       context: ./MealsAPI
       dockerfile: Dockerfile
-    container_name: MealsAPI
+    container_name: meals-api
     ports:
       - "8085:80"
     depends_on:
       - meals-database
 
   meals-database:
-    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    user: "0"
     ports:
       - "1403:1433"
-    container_name: "MealsDB"
-    hostname: "MealsDB"
+    container_name: meals-database
+    hostname: "meals-db"
     environment:
       MSSQL_SA_PASSWORD: "S3cur3P@ssW0rd!"
       ACCEPT_EULA: "Y"
     volumes:
+      # - meals-data:/var/opt/mssql/data
+      # - meals-log:/var/opt/mssql/log
+      # - meals-secrets:/var/opt/mssql/secrets
       - "./MealsAPI/mssql/data:/var/opt/mssql/data"
       - "./MealsAPI/mssql/log:/var/opt/mssql/log"
       - "./MealsAPI/mssql/secrets:/var/opt/mssql/secrets"
 
   dashboard-api:
-    image: "jorjooo/dashboard-api"
+    image: containerimageregistry.azurecr.io/dashboard-api:latest
     build:
       context: ./DashboardAPI
       dockerfile: Dockerfile
-    container_name: DashboardAPI
+    container_name: dashboard-api
     ports:
       - "8087:80"
     depends_on:
@@ -91,18 +174,19 @@ services:
       - database
       - redis
     environment:
-      WAIT_HOSTS: database:1433, meals-database:1433, measurements-database:1433
+      WAIT_HOSTS: database:1433, meals-database:1433, measurements-database:1433, redis:6379
       WAIT_TIMEOUT: 300
       WAIT_BEFORE: 15
 
   redis:
-    image: "redis"
+    image: registry.hub.docker.com/library/redis:latest
     ports:
       - "6379:6379"
 
   frontend:
-    image: "jorjooo/fitness-track-frontend"
-    container_name: "FitnessTrackFrontend"
+    image: containerimageregistry.azurecr.io/fitness-track-frontend:latest
+    container_name: fitness-track-frontend
     ports:
       - "80:80"
       - "443:443"
+    domainname: "fitness-track"
