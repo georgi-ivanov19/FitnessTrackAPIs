@@ -14,11 +14,17 @@ var mealsDbConnectionString = builder.Configuration.GetConnectionString("MealsDB
 var measurementsDbConnectionString = builder.Configuration.GetConnectionString("MeasurementsDBConnection") ?? throw new InvalidOperationException("Connection string 'MeasurementsDBConnection'... not found.");
 var workoutsDbConnectionString = builder.Configuration.GetConnectionString("WorkoutsDBConnection") ?? throw new InvalidOperationException("Connection string 'WorkoutsDBConnection'... not found.");
 builder.Services.AddDbContext<WorkoutsDatabaseContext>(options =>
-    options.UseSqlServer(workoutsDbConnectionString).EnableDetailedErrors());
+    options.UseSqlServer(workoutsDbConnectionString, builder => {
+        builder.EnableRetryOnFailure();
+    }).EnableDetailedErrors());
 builder.Services.AddDbContext<MealsDatabaseContext>(options =>
-    options.UseSqlServer(mealsDbConnectionString).EnableDetailedErrors());
+    options.UseSqlServer(mealsDbConnectionString, builder => {
+        builder.EnableRetryOnFailure();
+    }).EnableDetailedErrors());
 builder.Services.AddDbContext<MeasurementsDatabaseContext>(options =>
-    options.UseSqlServer(measurementsDbConnectionString).EnableDetailedErrors());
+    options.UseSqlServer(measurementsDbConnectionString, builder => {
+        builder.EnableRetryOnFailure();
+    }).EnableDetailedErrors());
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

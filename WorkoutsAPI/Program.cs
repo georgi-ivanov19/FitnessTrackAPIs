@@ -6,7 +6,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("WorkoutDBConnectionString") ?? throw new InvalidOperationException("Connection string 'WorkoutDBConnectionString' not found.");
 builder.Services.AddDbContext<DatabaseContext>(options =>
-    options.UseSqlServer(connectionString).EnableDetailedErrors());
+    options.UseSqlServer(connectionString, builder => {
+        builder.EnableRetryOnFailure();
+    }).EnableDetailedErrors());
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
