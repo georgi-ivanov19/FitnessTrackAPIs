@@ -49,14 +49,14 @@ namespace MeasurementsAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetMeasurements(string applicationUserId)
+        public async Task<IActionResult> GetMeasurements(string userId)
         {
 
-            if(applicationUserId == null)
+            if(userId == null)
             {
                 return BadRequest("User ID is a required parameter");
             }
-            var measurements = await _context.Measurements.Where(m => m.applicationUserId == applicationUserId).ToListAsync();
+            var measurements = await _context.Measurements.Where(m => m.applicationUserId == userId).ToListAsync();
 
             return Ok(measurements);
         }

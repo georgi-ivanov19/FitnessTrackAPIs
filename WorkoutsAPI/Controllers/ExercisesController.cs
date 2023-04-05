@@ -22,7 +22,7 @@ namespace WorkoutsAPI.Controllers
             _context = context;
         }
 
-        // GET: api/Exercises
+        // GET: api/Exercises/GetsExercises/{workoutId}
         [HttpGet("GetExercises/{id}")]
         public async Task<ActionResult<List<Exercise>>> GetExercisesForWorkout(int id)
         {
