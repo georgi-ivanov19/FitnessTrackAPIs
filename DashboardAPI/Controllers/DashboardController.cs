@@ -39,7 +39,7 @@ namespace DashboardAPI.Controllers
             byte[]? cachedData = await _cache.GetAsync(userId);
             if (cachedData != null)
             {
-                Console.WriteLine("!!!!!!!!!This is from cache!!!!!!!!!");
+                Console.WriteLine($"Request for user /{userId}/ served from Cache!");
                 // If the data is found in the cache, encode and deserialize cached data.
                 var cachedDataString = Encoding.UTF8.GetString(cachedData);
                 results = JsonSerializer.Deserialize<DashboardResults>(cachedDataString);

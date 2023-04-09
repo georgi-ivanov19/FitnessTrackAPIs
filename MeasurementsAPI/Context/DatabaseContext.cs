@@ -19,7 +19,16 @@ namespace MeasurementsAPI.Context
                                         "5febdbbe-d537-430f-9ccb-b48f252d2d4e",
                                         "c4824aab-c08f-4141-86c4-082fd8bbca8c",
                                         "2abf2679-ae98-456c-99ed-fe7ca2698c2e",
-                                        "5f9c85a5-0150-4a44-b5a8-e2bf0e72a6b1"
+                                        "5f9c85a5-0150-4a44-b5a8-e2bf0e72a6b1",
+                                        "b62f0930-8324-4751-8f51-28ed952311a6",
+                                        "fefae04f-02fd-4441-8cb3-5a55b1fff643",
+                                        "4a839a6d-2961-466b-bb2b-38b840aabb69",
+                                        "9bc75699-da3d-41ab-807b-854aba8662ca",
+                                        "97fa9890-e273-49c4-82bc-4d1a7b7cc9f6",
+                                        "e65338b5-6083-454a-991f-1c73d2d8530d",
+                                        "5ee19786-6177-43cb-bfd0-22fb5498a481",
+                                        "baf0862c-14d3-4832-8290-27d899b24c26",
+                                        "ef1964f0-3deb-46cc-a016-d549b13701da"
                                     };
             var measurements = new List<Measurement>();
             Random random = new Random();

@@ -19,16 +19,16 @@ namespace WorkoutsAPI.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<List<TrackedWorkout>>> GetTrackedWorkouts(int id)
-        {
-            var workout = await _context.Workouts.FirstOrDefaultAsync(w => w.Id == id);
-            if (workout == null)
-            {
-                return NotFound("Workout not found");
-            }
-            return Ok(workout.TrackedWorkouts);
-        }
+        //[HttpGet("{id}")]
+        //public async Task<ActionResult<List<TrackedWorkout>>> GetTrackedWorkouts(int id)
+        //{
+        //    var workout = await _context.Workouts.FirstOrDefaultAsync(w => w.Id == id);
+        //    if (workout == null)
+        //    {
+        //        return NotFound("Workout not found");
+        //    }
+        //    return Ok(workout.TrackedWorkouts);
+        //}
 
         [HttpPost]
         public async Task<ActionResult<Workout>> CreateTrackedWorkout(TrackedWorkout workout)
