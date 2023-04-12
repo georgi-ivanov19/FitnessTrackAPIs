@@ -9,10 +9,18 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseSqlServer(connectionString, builder => {
         builder.EnableRetryOnFailure();
     }).EnableDetailedErrors());
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
+{
+    builder.AllowAnyOrigin()
+           .AllowAnyMethod()
+           .AllowAnyHeader();
+}));
 
 var app = builder.Build();
 
@@ -22,15 +30,10 @@ var app = builder.Build();
     app.UseSwagger();
     app.UseSwaggerUI();
 // }
-app.UseCors(builder => builder
-       .AllowAnyHeader()
-       .AllowAnyMethod()
-       .AllowAnyOrigin()
-    );
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
+app.UseCors("MyPolicy");
 app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
