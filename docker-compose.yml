@@ -2,7 +2,8 @@ version: "3.4"
 
 services:
   workoutsapi:
-    image: containerimageregistry.azurecr.io/workouts-api:latest
+    image: jorjooo/workouts-api
+    #image: containerimageregistry.azurecr.io/workouts-api:latest
     container_name: workouts-api
     ports:
       - "8081:8081"
@@ -12,12 +13,13 @@ services:
 
   database:
     image: mcr.microsoft.com/mssql/server:2022-latest
+    user: "0"
     ports:
       - "1433:1433"
     container_name: workouts-database
     hostname: "workouts-db"
     environment:
-      MSSQL_SA_PASSWORD: S3cur3PassW0rd
+      MSSQL_SA_PASSWORD: "S3cur3PassW0rd!"
       ACCEPT_EULA: "Y"
     volumes:
       # - workouts-data:/var/opt/mssql/data
@@ -28,7 +30,8 @@ services:
       - "./WorkoutsAPI/mssql/secrets:/var/opt/mssql/secrets"
 
   measurements-api:
-    image: containerimageregistry.azurecr.io/measurements-api:latest
+    image: jorjooo/measurements-api
+    #image: containerimageregistry.azurecr.io/measurements-api:latest
     build:
       context: ./MeasurementsAPI
       dockerfile: Dockerfile
@@ -40,6 +43,7 @@ services:
 
   measurements-database:
     image: "mcr.microsoft.com/mssql/server:2022-latest"
+    user: "0"
     ports:
       - "1402:1433"
     container_name: measurements-database
@@ -56,7 +60,8 @@ services:
       - "./MeasurementsAPI/mssql/secrets:/var/opt/mssql/secrets"
 
   meals-api:
-    image: containerimageregistry.azurecr.io/meals-api:latest
+    image: jorjooo/meals-api
+    #image: containerimageregistry.azurecr.io/meals-api:latest
     build:
       context: ./MealsAPI
       dockerfile: Dockerfile
@@ -85,7 +90,8 @@ services:
       - "./MealsAPI/mssql/secrets:/var/opt/mssql/secrets"
 
   dashboard-api:
-    image: containerimageregistry.azurecr.io/dashboard-api:latest
+    image: jorjooo/dashboard-api
+    #image: containerimageregistry.azurecr.io/dashboard-api:latest
     build:
       context: ./DashboardAPI
       dockerfile: Dockerfile
@@ -108,7 +114,8 @@ services:
       - "6379:6379"
 
   frontend:
-    image: containerimageregistry.azurecr.io/fitness-track-frontend:latest
+    image: jorjooo/fitness-track-frontend
+    #image: containerimageregistry.azurecr.io/fitness-track-frontend:latest
     container_name: fitness-track-frontend
     ports:
       - "80:80"
