@@ -1,81 +1,5 @@
 version: "3.4"
 
-volumes:
-  workouts-data:
-    driver: azure_file
-    driver_opts:
-      share_name: workouts
-      storage_account_name: containerssto
-      storage_account_key: OUJr5oaZv8RNvRmDP37ix3HnVMhtSEjhU2WU/QJlRhfKWd6tO9gA8jBe+r7kBGl6J91/elt3TFD3+AStpRSMyw==
-    labels:
-      com.microsoft.azure.volume.azurefile.workingdir: /Workouts/data
-  workouts-log:
-    driver: azure_file
-    driver_opts:
-      share_name: workouts
-      storage_account_name: containerssto
-      storage_account_key: OUJr5oaZv8RNvRmDP37ix3HnVMhtSEjhU2WU/QJlRhfKWd6tO9gA8jBe+r7kBGl6J91/elt3TFD3+AStpRSMyw==
-    labels:
-      com.microsoft.azure.volume.azurefile.workingdir: /Workouts/log
-  workouts-secrets:
-    driver: azure_file
-    driver_opts:
-      share_name: workouts
-      storage_account_name: containerssto
-      storage_account_key: OUJr5oaZv8RNvRmDP37ix3HnVMhtSEjhU2WU/QJlRhfKWd6tO9gA8jBe+r7kBGl6J91/elt3TFD3+AStpRSMyw==
-    labels:
-      com.microsoft.azure.volume.azurefile.workingdir: /Workouts/secrets
-
-  measurements-data:
-    driver: azure_file
-    driver_opts:
-      share_name: measurements
-      storage_account_name: containerssto
-      storage_account_key: OUJr5oaZv8RNvRmDP37ix3HnVMhtSEjhU2WU/QJlRhfKWd6tO9gA8jBe+r7kBGl6J91/elt3TFD3+AStpRSMyw==
-    labels:
-      com.microsoft.azure.volume.azurefile.workingdir: /measurements/data
-  measurements-log:
-    driver: azure_file
-    driver_opts:
-      share_name: measurements
-      storage_account_name: containerssto
-      storage_account_key: OUJr5oaZv8RNvRmDP37ix3HnVMhtSEjhU2WU/QJlRhfKWd6tO9gA8jBe+r7kBGl6J91/elt3TFD3+AStpRSMyw==
-    labels:
-      com.microsoft.azure.volume.azurefile.workingdir: /measurements/log
-  measurements-secrets:
-    driver: azure_file
-    driver_opts:
-      share_name: measurements
-      storage_account_name: containerssto
-      storage_account_key: OUJr5oaZv8RNvRmDP37ix3HnVMhtSEjhU2WU/QJlRhfKWd6tO9gA8jBe+r7kBGl6J91/elt3TFD3+AStpRSMyw==
-    labels:
-      com.microsoft.azure.volume.azurefile.workingdir: /measurements/secrets
-
-  meals-data:
-    driver: azure_file
-    driver_opts:
-      share_name: meals
-      storage_account_name: containerssto
-      storage_account_key: OUJr5oaZv8RNvRmDP37ix3HnVMhtSEjhU2WU/QJlRhfKWd6tO9gA8jBe+r7kBGl6J91/elt3TFD3+AStpRSMyw==
-    labels:
-      com.microsoft.azure.volume.azurefile.workingdir: /meals/data
-  meals-log:
-    driver: azure_file
-    driver_opts:
-      share_name: meals
-      storage_account_name: containerssto
-      storage_account_key: OUJr5oaZv8RNvRmDP37ix3HnVMhtSEjhU2WU/QJlRhfKWd6tO9gA8jBe+r7kBGl6J91/elt3TFD3+AStpRSMyw==
-    labels:
-      com.microsoft.azure.volume.azurefile.workingdir: /meals/log
-  meals-secrets:
-    driver: azure_file
-    driver_opts:
-      share_name: meals
-      storage_account_name: containerssto
-      storage_account_key: OUJr5oaZv8RNvRmDP37ix3HnVMhtSEjhU2WU/QJlRhfKWd6tO9gA8jBe+r7kBGl6J91/elt3TFD3+AStpRSMyw==
-    labels:
-      com.microsoft.azure.volume.azurefile.workingdir: /meals/secrets
-
 services:
   workoutsapi:
     image: containerimageregistry.azurecr.io/workouts-api:latest
@@ -96,12 +20,12 @@ services:
       MSSQL_SA_PASSWORD: S3cur3PassW0rd
       ACCEPT_EULA: "Y"
     volumes:
-      - workouts-data:/var/opt/mssql/data
-      - workouts-log:/var/opt/mssql/log
-      - workouts-secrets:/var/opt/mssql/secrets
-      # - "./WorkoutsAPI/mssql/data:/var/opt/mssql/data"
-      # - "./WorkoutsAPI/mssql/log:/var/opt/mssql/log"
-      # - "./WorkoutsAPI/mssql/secrets:/var/opt/mssql/secrets"
+      # - workouts-data:/var/opt/mssql/data
+      # - workouts-log:/var/opt/mssql/log
+      # - workouts-secrets:/var/opt/mssql/secrets
+      - "./WorkoutsAPI/mssql/data:/var/opt/mssql/data"
+      - "./WorkoutsAPI/mssql/log:/var/opt/mssql/log"
+      - "./WorkoutsAPI/mssql/secrets:/var/opt/mssql/secrets"
 
   measurements-api:
     image: containerimageregistry.azurecr.io/measurements-api:latest
